@@ -251,7 +251,7 @@ WHERE
 -- Stored procedure para randomização
 DELIMITER //
 
-CREATE PROCEDURE sp_gerar_personagem(
+CREATE OR REPLACE PROCEDURE sp_gerar_personagem(
     IN p_usuario_id INT,
     IN p_faccao CHAR(1),
     IN p_funcao VARCHAR(10),
@@ -261,35 +261,54 @@ BEGIN
     DECLARE v_raca_id INT;
     DECLARE v_classe_id INT;
     DECLARE v_especializacao_id INT;
+    DECLARE v_count INT;
     
-    -- Seleciona raça aleatória conforme facção
+    -- Verifica e obtém raça válida
     IF p_faccao IS NULL THEN
-        SELECT id INTO v_raca_id FROM racas WHERE ativa = TRUE ORDER BY RAND() LIMIT 1;
+        SELECT COUNT(*) INTO v_count FROM racas WHERE ativa = TRUE;
+        IF v_count = 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Nenhuma raça disponível';
+        END IF;
+        
+        SELECT id INTO v_raca_id FROM racas 
+        WHERE ativa = TRUE 
+        ORDER BY RAND() LIMIT 1;
     ELSE
-        SELECT id INTO v_raca_id FROM racas WHERE faccao_id = p_faccao AND ativa = TRUE ORDER BY RAND() LIMIT 1;
+        SELECT COUNT(*) INTO v_count FROM racas 
+        WHERE faccao_id = p_faccao AND ativa = TRUE;
+        IF v_count = 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Nenhuma raça disponível para a facção selecionada';
+        END IF;
+        
+        SELECT id INTO v_raca_id FROM racas 
+        WHERE faccao_id = p_faccao AND ativa = TRUE 
+        ORDER BY RAND() LIMIT 1;
     END IF;
     
-    -- Seleciona classe aleatória compatível com a raça e filtros
-    IF p_funcao IS NULL AND p_tipo_combate IS NULL THEN
-        SELECT classe_id INTO v_classe_id 
-        FROM raca_classe 
-        WHERE raca_id = v_raca_id 
-        ORDER BY RAND() 
-        LIMIT 1;
-    ELSE
-        SELECT c.id INTO v_classe_id
-        FROM classes c
-        JOIN raca_classe rc ON c.id = rc.classe_id
-        JOIN especializacoes e ON c.id = e.classe_id
-        WHERE rc.raca_id = v_raca_id
-        AND (p_funcao IS NULL OR e.funcao = p_funcao)
-        AND (p_tipo_combate IS NULL OR c.tipo_combate = p_tipo_combate)
-        GROUP BY c.id
-        ORDER BY RAND()
-        LIMIT 1;
+    -- Verifica e obtém classe válida
+    SELECT COUNT(*) INTO v_count FROM raca_classe 
+    JOIN classes c ON c.id = raca_classe.classe_id
+    JOIN especializacoes e ON e.classe_id = c.id
+    WHERE raca_id = v_raca_id
+    AND (p_funcao IS NULL OR e.funcao = p_funcao)
+    AND (p_tipo_combate IS NULL OR c.tipo_combate = p_tipo_combate);
+    
+    IF v_count = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Nenhuma combinação válida encontrada com os filtros selecionados';
     END IF;
     
-    -- Seleciona especialização aleatória conforme função (se especificada)
+    SELECT c.id INTO v_classe_id
+    FROM classes c
+    JOIN raca_classe rc ON c.id = rc.classe_id
+    JOIN especializacoes e ON c.id = e.classe_id
+    WHERE rc.raca_id = v_raca_id
+    AND (p_funcao IS NULL OR e.funcao = p_funcao)
+    AND (p_tipo_combate IS NULL OR c.tipo_combate = p_tipo_combate)
+    GROUP BY c.id
+    ORDER BY RAND()
+    LIMIT 1;
+    
+    -- Obtém especialização
     IF p_funcao IS NULL THEN
         SELECT id INTO v_especializacao_id 
         FROM especializacoes 
@@ -304,10 +323,12 @@ BEGIN
         LIMIT 1;
     END IF;
     
-    -- Registra no histórico
-    INSERT INTO historico_randomizacoes (usuario_id, raca_id, classe_id, especializacao_id, parametros)
-    VALUES (p_usuario_id, v_raca_id, v_classe_id, v_especializacao_id, 
-            CONCAT('{"faccao":"', IFNULL(p_faccao, 'aleatorio'), '", "funcao":"', IFNULL(p_funcao, 'aleatorio'), '", "tipo_combate":"', IFNULL(p_tipo_combate, 'aleatorio'), '"}'));
+    -- Registra no histórico (apenas se usuario_id não for NULL)
+    IF p_usuario_id IS NOT NULL THEN
+        INSERT INTO historico_randomizacoes (usuario_id, raca_id, classe_id, especializacao_id, parametros)
+        VALUES (p_usuario_id, v_raca_id, v_classe_id, v_especializacao_id, 
+                CONCAT('{"faccao":"', IFNULL(p_faccao, 'aleatorio'), '", "funcao":"', IFNULL(p_funcao, 'aleatorio'), '", "tipo_combate":"', IFNULL(p_tipo_combate, 'aleatorio'), '"}'));
+    END IF;
     
     -- Retorna o resultado
     SELECT 
@@ -330,7 +351,6 @@ BEGIN
 END //
 
 DELIMITER ;
-
 -- Criar usuário admin padrão
 INSERT INTO usuarios (nome_usuario, email, senha_hash) 
 VALUES ('admin', 'admin@wowrandomizer.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'); -- senha: password
