@@ -3,13 +3,20 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/conexao.php';
 include __DIR__ . '/includes/header.php';
 
-function sanitize_icon_name($string) {
+function sanitize_icon_name($string, $is_race = false)
+{
     $string = strtolower($string);
-    return str_replace(
-        ['ã','á','â','à','é','ê','í','ó','ô','õ','ú','ç',' '],
-        ['a','a','a','a','e','e','i','o','o','o','u','c',''],
+    $string = str_replace(
+        ['ã', 'á', 'â', 'à', 'é', 'ê', 'í', 'ó', 'ô', 'õ', 'ú', 'ç'],
+        ['a', 'a', 'a', 'a', 'e', 'e', 'i', 'o', 'o', 'o', 'u', 'c'],
         $string
     );
+    if ($is_race) {
+        $string = str_replace(' ', '_', $string);
+    } else {
+        $string = str_replace(' ', '', $string); // para classes como "cavaleiro da morte"
+    }
+    return $string;
 }
 
 $personagem = null;
@@ -32,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $classe = strtolower($row['classe']);
                 $raca = strtolower($row['raca']);
 
+                // Limitar Caçador de Demônios apenas a Elfos Noturnos e Elfos Sangrentos
                 if ($classe === 'caçador de demônios') {
                     if (!in_array($raca, ['elfo noturno', 'elfa noturna', 'elfo sangrento', 'elfa sangrenta'])) {
                         continue;
@@ -101,70 +109,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Seu personagem foi gerado!
                 </h3>
 
+                <!-- Facção -->
                 <p>
                     <span class="wow-label">🏳️ Facção:</span>
                     <?php
-                        $facCode = strtolower($personagem['faccao']) === 'horda' ? 'h' : 'a';
-                        echo "<img class='wow-icon' src='assets/img/icons/faccao_{$facCode}.png' alt='Facção'> ";
-                        echo htmlspecialchars($personagem['faccao']);
+                    $facCode = strtolower($personagem['faccao']) === 'horda' ? 'h' : 'a';
+                    echo "<img class='wow-icon' src='assets/img/icons/faccao_{$facCode}.png' alt='Facção'> ";
+                    echo htmlspecialchars($personagem['faccao']);
                     ?>
                 </p>
 
+                <!-- Raça -->
                 <p>
                     <span class="wow-label">🧬 Raça:</span>
                     <?php
-                        $racaOriginal = $personagem['raca'];
-                        $genero = rand(0, 1) === 0 ? '_m' : '_f';
-                        $racaSan = sanitize_icon_name($racaOriginal);
-                        $racaKey = "{$racaSan}{$genero}";
-                        $iconeRaca = "assets/img/racas/{$racaKey}.png";
+                    $racaOriginal = $personagem['raca'];
+                    $genero = rand(0, 1) === 0 ? '_m' : '_f';
+                    $racaSan = sanitize_icon_name($racaOriginal, true);
+                    $racaKey = "{$racaSan}{$genero}";
+                    $iconeRaca = "assets/img/racas/{$racaKey}.png";
 
-                        $mapaGenero = [
-                            'anao_m' => 'Anao',
-                            'anao_f' => 'Ana',
-                            'orc_f' => 'Orquisa',
-                            'tauren_f' => 'Taurena',
-                            'troll_f' => 'Trollesa',
-                            'elfo_noturno_f' => 'Elfa Noturna',
-                            'elfo_sangrento_f' => 'Elfa Sangrenta',
-                            'draenei_f' => 'Draenei Femea',
-                            'goblin_f' => 'Goblin Femea',
-                            'worgen_f' => 'Worgen Femea',
-                            'gnomo_f' => 'Gnoma',
-                            'renegado_f' => 'Renegada',
-                            'renegado_m' => 'Renegado'
-                        ];
+                    $mapaGenero = [
+                        'anao_f' => 'Ana',
+                        'orc_f' => 'Orquisa',
+                        'tauren_f' => 'Taurena',
+                        'troll_f' => 'Trollesa',
+                        'elfo_noturno_f' => 'Elfa Noturna',
+                        'elfo_sangrento_f' => 'Elfa Sangrenta',
+                        'draenei_f' => 'Draenei Fêmea',
+                        'goblin_f' => 'Goblin Fêmea',
+                        'worgen_f' => 'Worgen Fêmea',
+                        'gnomo_f' => 'Gnoma',
+                        'renegado_f' => 'Renegada',
+                        'renegado_m' => 'Renegado'
+                    ];
 
-                        $label = $mapaGenero[$racaKey] ?? $racaOriginal;
+                    $label = $mapaGenero[$racaKey] ?? $racaOriginal;
 
-                        echo "<img class='wow-icon' src='{$iconeRaca}' alt='{$label}'> ";
-                        echo htmlspecialchars($label);
+                    echo "<img class='wow-icon' src='{$iconeRaca}' alt='{$label}'> ";
+                    echo htmlspecialchars($label);
                     ?>
                 </p>
 
+                <!-- Classe -->
                 <p>
                     <span class="wow-label">⚔️ Classe:</span>
                     <?php
-                        $classeSan = sanitize_icon_name($personagem['classe']);
-                        $classeIcon = "assets/img/icons/{$classeSan}.png";
-                        $corClasse = $personagem['cor_hex'] ?? '#FFD700';
-                        echo "<img class='wow-icon' src='{$classeIcon}' alt='Classe'> ";
-                        echo "<span class='wow-badge' style='background-color: {$corClasse}'>" . htmlspecialchars($personagem['classe']) . "</span>";
-                        echo " (" . htmlspecialchars($personagem['tipo_combate']) . ")";
+                    $classeSan = sanitize_icon_name($personagem['classe']);
+                    $classeIcon = "assets/img/icons/{$classeSan}.png";
+                    $corClasse = $personagem['cor_hex'] ?? '#FFD700';
+
+                    echo "<img class='wow-icon' src='{$classeIcon}' alt='Classe'> ";
+                    echo "<span class='wow-badge' style='background-color: {$corClasse}'>" . htmlspecialchars($personagem['classe']) . "</span>";
+                    echo " (" . htmlspecialchars($personagem['tipo_combate']) . ")";
                     ?>
                 </p>
 
+                <!-- Especialização -->
                 <p>
                     <span class="wow-label">🌟 Especialização:</span>
-                    <em><?= htmlspecialchars($personagem['especializacao']) ?> (<?= htmlspecialchars($personagem['funcao']) ?>)</em>
+                    <span class="wow-special">
+                        <?= htmlspecialchars($personagem['especializacao']) ?> (<?= htmlspecialchars($personagem['funcao']) ?>)
+                    </span>
                 </p>
 
                 <?php if (!empty($personagem['descricao'])): ?>
-                    <div class="descricao-especializacao mt-3">
-                        <h5>Sobre a Especialização:</h5>
+                    <div class="descricao-especializacao">
+                        <h5>Sobre a Especialização</h5>
                         <p><?= htmlspecialchars($personagem['descricao']) ?></p>
                     </div>
                 <?php endif; ?>
+
             </div>
         </div>
     <?php endif; ?>
