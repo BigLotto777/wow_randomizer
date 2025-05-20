@@ -231,14 +231,14 @@ CREATE VIEW vw_combinacoes_validas AS
 SELECT 
     r.id AS raca_id,
     r.nome AS raca,
-    r.faccao_id,
     f.nome AS faccao,
     c.id AS classe_id,
     c.nome AS classe,
     c.tipo_combate,
     e.id AS especializacao_id,
     e.nome AS especializacao,
-    e.funcao
+    e.funcao,
+    e.descricao -- ✅ esta linha inclui o campo que você precisa
 FROM 
     racas r
     JOIN faccoes f ON r.faccao_id = f.id
@@ -341,6 +341,7 @@ BEGIN
         e.id AS especializacao_id,
         e.nome AS especializacao,
         e.funcao
+        e.descricao
     FROM 
         racas r
         JOIN faccoes f ON r.faccao_id = f.id

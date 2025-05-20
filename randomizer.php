@@ -1,50 +1,60 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/conexao.php';
+include __DIR__ . '/includes/header.php';
 
-// Verifica se o usuário está logado
-if (!isset($_SESSION['usuario_id'])) {
-    // Se não estiver logado, usa um valor padrão (0 ou NULL, conforme sua tabela permitir)
-    $usuario_id = 0; // Ou NULL se a coluna permitir
-    // Alternativamente, redirecione para login:
-    // header('Location: login.php?redirect='.urlencode($_SERVER['REQUEST_URI']));
-    // exit();
-} else {
-    $usuario_id = $_SESSION['usuario_id'];
+function sanitize_icon_name($string) {
+    $string = strtolower($string);
+    return str_replace(
+        ['ã','á','â','à','é','ê','í','ó','ô','õ','ú','ç',' '],
+        ['a','a','a','a','e','e','i','o','o','o','u','c',''],
+        $string
+    );
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $faccao = $_POST['faccao'] ?? null;
-    $funcao = $_POST['funcao'] ?? null;
-    
+$personagem = null;
+$erro = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $usuario_id = $_SESSION['usuario_id'] ?? null;
+    $faccao = $_POST['faccao'] ?: null;
+    $funcao = $_POST['funcao'] ?: null;
+    $tipo_combate = $_POST['tipo_combate'] ?: null;
+
     try {
-        $stmt = $conn->prepare("CALL sp_gerar_personagem(?, ?, ?, NULL)");
-        $stmt->bind_param("iss", $usuario_id, $faccao, $funcao);
+        $stmt = $conn->prepare("CALL sp_gerar_personagem(?, ?, ?, ?)");
+        $stmt->bind_param("isss", $usuario_id, $faccao, $funcao, $tipo_combate);
         $stmt->execute();
         $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            $personagem = $result->fetch_assoc();
-            echo '<div class="alert alert-success">';
-            echo "<h4>Seu personagem:</h4>";
-            echo "<p><strong>Raça:</strong> {$personagem['raca']} ({$personagem['faccao']})</p>";
-            echo "<p><strong>Classe:</strong> {$personagem['classe']} ({$personagem['tipo_combate']})</p>";
-            echo "<p><strong>Especialização:</strong> {$personagem['especializacao']} ({$personagem['funcao']})</p>";
-            echo '</div>';
+
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $classe = strtolower($row['classe']);
+                $raca = strtolower($row['raca']);
+
+                if ($classe === 'caçador de demônios') {
+                    if (!in_array($raca, ['elfo noturno', 'elfa noturna', 'elfo sangrento', 'elfa sangrenta'])) {
+                        continue;
+                    }
+                }
+
+                $personagem = $row;
+                break;
+            }
+        }
+
+        while ($conn->more_results() && $conn->next_result()) {
+            $conn->use_result();
         }
     } catch (mysqli_sql_exception $e) {
-        echo '<div class="alert alert-danger">';
-        echo "Erro ao gerar personagem: " . $e->getMessage();
-        echo '</div>';
+        $erro = "Erro ao gerar personagem: " . $e->getMessage();
     }
 }
 ?>
 
-<?php include __DIR__ . '/includes/header.php'; ?>
-
 <div class="container mt-5">
-    <h2>Gerar Personagem Aleatório</h2>
-    
+    <h2 class="text-center mb-4">Gerar Novo Aventureiro!</h2>
+
     <form method="post" class="mb-4">
         <div class="row g-3">
             <div class="col-md-4">
@@ -64,13 +74,100 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <option value="Healer">Healer</option>
                 </select>
             </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">
+            <div class="col-md-4">
+                <label class="form-label">Tipo de Combate:</label>
+                <select name="tipo_combate" class="form-select">
+                    <option value="">Qualquer</option>
+                    <option value="Melee">Melee</option>
+                    <option value="Ranged">Ranged</option>
+                    <option value="Híbrido">Híbrido</option>
+                </select>
+            </div>
+            <div class="col-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">
                     <i class="fas fa-random me-2"></i>Gerar
                 </button>
             </div>
         </div>
     </form>
+
+    <?php if ($erro): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
+    <?php elseif ($personagem): ?>
+        <div class="card wow-card fade-in mb-4">
+            <div class="card-body">
+                <h3 class="wow-title">
+                    <img class="wow-icon" src="assets/img/wow-logo.png" alt="World of Warcraft">
+                    Seu personagem foi gerado!
+                </h3>
+
+                <p>
+                    <span class="wow-label">🏳️ Facção:</span>
+                    <?php
+                        $facCode = strtolower($personagem['faccao']) === 'horda' ? 'h' : 'a';
+                        echo "<img class='wow-icon' src='assets/img/icons/faccao_{$facCode}.png' alt='Facção'> ";
+                        echo htmlspecialchars($personagem['faccao']);
+                    ?>
+                </p>
+
+                <p>
+                    <span class="wow-label">🧬 Raça:</span>
+                    <?php
+                        $racaOriginal = $personagem['raca'];
+                        $genero = rand(0, 1) === 0 ? '_m' : '_f';
+                        $racaSan = sanitize_icon_name($racaOriginal);
+                        $racaKey = "{$racaSan}{$genero}";
+                        $iconeRaca = "assets/img/racas/{$racaKey}.png";
+
+                        $mapaGenero = [
+                            'anao_m' => 'Anao',
+                            'anao_f' => 'Ana',
+                            'orc_f' => 'Orquisa',
+                            'tauren_f' => 'Taurena',
+                            'troll_f' => 'Trollesa',
+                            'elfo_noturno_f' => 'Elfa Noturna',
+                            'elfo_sangrento_f' => 'Elfa Sangrenta',
+                            'draenei_f' => 'Draenei Femea',
+                            'goblin_f' => 'Goblin Femea',
+                            'worgen_f' => 'Worgen Femea',
+                            'gnomo_f' => 'Gnoma',
+                            'renegado_f' => 'Renegada',
+                            'renegado_m' => 'Renegado'
+                        ];
+
+                        $label = $mapaGenero[$racaKey] ?? $racaOriginal;
+
+                        echo "<img class='wow-icon' src='{$iconeRaca}' alt='{$label}'> ";
+                        echo htmlspecialchars($label);
+                    ?>
+                </p>
+
+                <p>
+                    <span class="wow-label">⚔️ Classe:</span>
+                    <?php
+                        $classeSan = sanitize_icon_name($personagem['classe']);
+                        $classeIcon = "assets/img/icons/{$classeSan}.png";
+                        $corClasse = $personagem['cor_hex'] ?? '#FFD700';
+                        echo "<img class='wow-icon' src='{$classeIcon}' alt='Classe'> ";
+                        echo "<span class='wow-badge' style='background-color: {$corClasse}'>" . htmlspecialchars($personagem['classe']) . "</span>";
+                        echo " (" . htmlspecialchars($personagem['tipo_combate']) . ")";
+                    ?>
+                </p>
+
+                <p>
+                    <span class="wow-label">🌟 Especialização:</span>
+                    <em><?= htmlspecialchars($personagem['especializacao']) ?> (<?= htmlspecialchars($personagem['funcao']) ?>)</em>
+                </p>
+
+                <?php if (!empty($personagem['descricao'])): ?>
+                    <div class="descricao-especializacao mt-3">
+                        <h5>Sobre a Especialização:</h5>
+                        <p><?= htmlspecialchars($personagem['descricao']) ?></p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

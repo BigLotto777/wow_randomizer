@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
+body {
+    background-color: #111;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.wow-card {
+    background-image: url('../img/wow-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    border: 3px solid #FFD700;
+    border-radius: 10px;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+    overflow: hidden;
+    margin-top: 30px;
+    color: #fff; /* força branco */
+}
+
+.wow-card .card-body {
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 30px 40px;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    border-radius: 10px;
+    color: #fff;
+}
+
+.wow-title {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 2rem;
+    color: #FFD700;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wow-label {
+    font-weight: bold;
+    color: #ffffff;
+    display: inline-block;
+    min-width: 150px;
+}
+
+.wow-icon {
+    height: 68px;
+    width: auto;
+    margin-right: 10px;
+    vertical-align: middle;
+    border-radius: 4px;
+    background-color: transparent;
+}
+
+.wow-badge {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    color: #000000;
+    background-color: #FFD700;
+    display: inline-block;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.fade-in {
+    animation: fadeIn ease 1s;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.descricao-especializacao h5 {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.descricao-especializacao p {
+    color: #ddd;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.btn-primary {
+    background-color: #0056b3;
+    border-color: #004a99;
+    font-weight: bold;
+    padding: 8px 20px;
+}
+
+.alert-danger {
+    background-color: #330000;
+    border: 1px solid #aa0000;
+    color: #ffcccc;
+}
