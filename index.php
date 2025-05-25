@@ -1,87 +1,92 @@
 <?php
-define('BASE_DIR', __DIR__);
-
-// Verificação de segurança para includes
-$headerPath = BASE_DIR . '/includes/header.php';
-if (!file_exists($headerPath)) die("Erro: Arquivo header.php não encontrado");
-require_once $headerPath;
+session_start();
 ?>
 
-<style>
-    .hero-section {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                    url('assets/img/wow-landscape.jpg') no-repeat center center;
-        background-size: cover;
-        color: white;
-        padding: 8rem 0;
-        margin-bottom: 3rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-    
-    .feature-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-    }
-</style>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoW Randomizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-wow">
 
-<div class="hero-section">
-    <div class="container text-center">
-        <h1 class="display-3 fw-bold mb-4">Randomizador de Personagens WoW</h1>
-        <p class="lead fs-3 mb-5">Gere combinações aleatórias para sua próxima aventura em Azeroth!</p>
-        
-        <div class="d-flex justify-content-center gap-3">
-            <a href="randomizer.php" class="btn btn-primary btn-lg px-4 py-3">
-                <i class="fas fa-random me-2"></i> Gerar Personagem
-            </a>
-            <a href="login.php" class="btn btn-outline-light btn-lg px-4 py-3">
-                <i class="fas fa-user me-2"></i> Área do Jogador
-            </a>
+<!-- ✅ Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-warning shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="index.php">
+            <img src="assets/img/wow-logo.png" alt="WoW" width="35">
+            WoW Randomizer
+        </a>
+        <div class="d-flex">
+            <a href="randomizer.php" class="btn btn-outline-light btn-sm me-2">Gerar Personagem</a>
+            <?php if (isset($_SESSION['usuario_id'])): ?>
+                <a href="dashboard.php" class="btn btn-outline-info btn-sm me-2">Dashboard</a>
+                <a href="logout.php" class="btn btn-danger btn-sm">Logout</a>
+            <?php else: ?>
+                <a href="login.php" class="btn btn-outline-light btn-sm me-2">Login</a>
+                <a href="register.php" class="btn btn-warning btn-sm">Registrar</a>
+            <?php endif; ?>
+        </div>
+    </div>
+</nav>
+
+<!-- ✅ Conteúdo principal -->
+<div class="container main-content">
+    <div class="bg-blur-box mb-4">
+        <h1 class="wow-title mb-4">
+            <img src="assets/img/wow-logo.png" class="wow-icon">
+            WoW Randomizer
+        </h1>
+        <p class="lead mb-4">Bem-vindo ao Randomizador de Personagens de World of Warcraft.</p>
+        <a href="randomizer.php" class="btn btn-primary btn-lg">🎲 Gerar Personagem Aleatório</a>
+    </div>
+
+    <!-- ✅ Seção de informações -->
+    <div class="row justify-content-center">
+        <!-- Fações -->
+        <div class="col-md-3 info-box">
+            <h4>Escolha sua Facção!</h4>
+            <img src="assets/img/icons/faccao_h.png" alt="Horda">
+            <img src="assets/img/icons/faccao_a.png" alt="Aliança">
+            <p>Horda ou Aliança? Escolha seu lado!</p>
+        </div>
+
+        <!-- Raças -->
+        <div class="col-md-3 info-box">
+            <h4>12 Raças!</h4>
+            <?php
+            $racas = ['Humano', 'Anao', 'Elfo Noturno', 'Gnomo', 'Draenei', 'Worgen', 'Orc', 'Tauren', 'Troll', 'Elfo Sangrento', 'Goblin', 'Renegado'];
+            foreach ($racas as $raca) {
+                $icone = strtolower(str_replace(' ', '_', $raca));
+                echo "<img src='assets/img/racas/{$icone}_m.png' alt='{$raca}' title='{$raca}'>";
+            }
+            ?>
+            <p>Escolha entre 12 raças lendárias!</p>
+        </div>
+
+        <!-- Classes -->
+        <div class="col-md-3 info-box">
+            <h4>12 Classes!</h4>
+            <?php
+            $classes = ['Guerreiro', 'Caçador', 'Mago', 'Ladino', 'Sacerdote', 'Bruxo', 'Paladino', 'Druida', 'Xamã', 'Monge', 'Caçador de Demônios', 'Cavaleiro da Morte'];
+            foreach ($classes as $classe) {
+                $icone = strtolower(str_replace([' ', 'ç', 'ã', 'ô'], ['','c','a','o'], $classe));
+                echo "<img src='assets/img/icons/{$icone}.png' alt='{$classe}' title='{$classe}'>";
+            }
+            ?>
+            <p>Aventure-se com 12 classes do WoW!</p>
         </div>
     </div>
 </div>
 
-<div class="container">
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center p-4">
-                    <div class="feature-icon text-primary">
-                        <i class="fas fa-flag"></i>
-                    </div>
-                    <h3>Horda ou Aliança</h3>
-                    <p class="text-muted">Escolha sua facção ou surpreenda-se com um personagem aleatório</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center p-4">
-                    <div class="feature-icon text-danger">
-                        <i class="fas fa-helmet-battle"></i>
-                    </div>
-                    <h3>12 Classes</h3>
-                    <p class="text-muted">Desde guerreiros até cavaleiros da morte e caçadores de demônios</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center p-4">
-                    <div class="feature-icon text-success">
-                        <i class="fas fa-book-spells"></i>
-                    </div>
-                    <h3>36 Especializações</h3>
-                    <p class="text-muted">Tank, Healer ou DPS - encontre seu estilo de jogo ideal</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- ✅ Footer -->
+<footer class="text-center text-light p-3">
+    <small>&copy; <?= date('Y') ?> WoW Randomizer. Por Vitor Beloto.</small>
+</footer>
 
-<?php
-$footerPath = BASE_DIR . '/includes/footer.php';
-if (!file_exists($footerPath)) die("Erro: Arquivo footer.php não encontrado");
-require_once $footerPath;
-?>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

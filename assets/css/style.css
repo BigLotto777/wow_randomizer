@@ -6,27 +6,7 @@ body {
     font-family: 'Segoe UI', sans-serif;
 }
 
-.wow-card {
-    background-image: url('../img/wow-bg.jpg');
-    background-size: cover;
-    background-position: center;
-    border: 3px solid #FFD700;
-    border-radius: 10px;
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
-    overflow: hidden;
-    margin-top: 30px;
-    color: #fff; /* força branco */
-}
-
-.wow-card .card-body {
-    background-color: rgba(0, 0, 0, 0.85);
-    padding: 30px 40px;
-    font-size: 1.1rem;
-    line-height: 1.8;
-    border-radius: 10px;
-    color: #fff;
-}
-
+/* ================== Cabeçalhos ================== */
 .wow-title {
     font-family: 'MedievalSharp', cursive;
     font-size: 2rem;
@@ -38,6 +18,7 @@ body {
     gap: 10px;
 }
 
+/* ================== Labels ================== */
 .wow-label {
     font-weight: bold;
     color: #ffffff;
@@ -45,15 +26,16 @@ body {
     min-width: 150px;
 }
 
+/* ================== Ícones ================== */
 .wow-icon {
     height: 68px;
     width: auto;
     margin-right: 10px;
     vertical-align: middle;
     border-radius: 4px;
-    background-color: transparent;
 }
 
+/* ================== Badges de Classe ================== */
 .wow-badge {
     padding: 6px 14px;
     border-radius: 6px;
@@ -65,6 +47,86 @@ body {
     box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
+/* ================== Especialização ================== */
+.wow-special {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+/* ================== Descrição da Especialização ================== */
+.descricao-especializacao h5 {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.descricao-especializacao p {
+    color: #ddd;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* ================== Cartões ================== */
+.wow-card {
+    background-image: url('../img/wow-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    border: 3px solid #FFD700;
+    border-radius: 10px;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+    overflow: hidden;
+}
+
+.wow-card .card-body {
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 30px 40px;
+    border-radius: 10px;
+}
+
+/* ================== Botões ================== */
+.btn-primary {
+    background-color: #0056b3;
+    border-color: #004a99;
+    font-weight: bold;
+}
+
+.btn-danger {
+    background-color: #c0392b;
+    border-color: #922b21;
+}
+
+.btn-warning {
+    background-color: #f1c40f;
+    border-color: #d4ac0d;
+    color: #000;
+}
+
+.btn-outline-light:hover {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+/* ================== Tabela ================== */
+.table thead {
+    background-color: #1a1a1a;
+    border-bottom: 2px solid #FFD700;
+}
+
+.table-dark {
+    background-color: #181818;
+}
+
+.table-dark th,
+.table-dark td {
+    color: #f1f1f1;
+    vertical-align: middle;
+}
+
+.table-dark tbody tr:hover {
+    background-color: rgba(255, 215, 0, 0.1);
+}
+
+/* ================== Fade-in ================== */
 .fade-in {
     animation: fadeIn ease 1s;
 }
@@ -79,45 +141,102 @@ body {
         transform: translateY(0);
     }
 }
-.descricao-especializacao {
-    margin-top: 25px;
-    padding: 15px 20px;
-    background-color: rgba(255, 215, 0, 0.1);
-    border-left: 4px solid #FFD700;
-    border-radius: 6px;
+
+/* ================== Footer ================== */
+footer {
+    background-color: #222;
+    color: #aaa;
 }
 
-.descricao-especializacao h5 {
-    font-size: 1.2rem;
-    color: #FFD700;
-    margin-bottom: 10px;
-    text-shadow: 1px 1px 1px black;
+/* ================== Navbar ================== */
+.navbar {
+    border-bottom: 2px solid #FFD700;
 }
 
-.descricao-especializacao p {
-    color: #eee;
-    font-size: 1.05rem;
-    font-style: italic;
-    line-height: 1.6;
+.navbar .navbar-brand {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 1.5rem;
 }
 
-
-.btn-primary {
-    background-color: #0056b3;
-    border-color: #004a99;
+.navbar .btn {
     font-weight: bold;
-    padding: 8px 20px;
 }
 
+/* ================== Alerts ================== */
 .alert-danger {
-    background-color: #330000;
+    background-color: #5c0000;
     border: 1px solid #aa0000;
     color: #ffcccc;
 }
 
-.wow-special {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #FFD700;
-    text-shadow: 1px 1px 2px black;
+.alert-info {
+    background-color: #007bff;
+    border-color: #0056b3;
+    color: white;
 }
+
+/* ================== Cards do Dashboard ================== */
+.card-title {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+.card-text {
+    color: #ccc;
+}
+
+.card .btn {
+    font-weight: bold;
+}
+
+/* Background para a página Index */
+/* Background */
+.bg-wow {
+    background: url('../img/wow-landscape.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Conteúdo principal */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-shadow: 2px 2px 4px #000;
+}
+
+/* Bloco central do site */
+.bg-blur-box {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 30px;
+    border-radius: 12px;
+    border: 2px solid #FFD700;
+    text-align: center;
+}
+
+/* Cards de informação */
+.info-box {
+    background-color: rgba(20, 20, 20, 0.9);
+    border: 1px solid #FFD700;
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    text-align: center;
+    margin: 10px;
+}
+
+.info-box img {
+    width: 35px;
+    height: 35px;
+    margin: 5px;
+}
+
+footer {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+
