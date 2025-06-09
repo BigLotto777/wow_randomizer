@@ -84,7 +84,10 @@ function sanitize_icon_name($string, $is_race = false) {
     </h2>
 
     <?php if ($result->num_rows > 0): ?>
-        <div class="d-flex justify-content-end mb-2">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="exportar_pdf.php" target="_blank" class="btn btn-outline-warning btn-sm fw-bold">
+                📄 Exportar PDF
+            </a>
             <a href="historico.php?clear=1" class="btn btn-danger btn-sm"
                onclick="return confirm('Tem certeza que deseja limpar todo o histórico?')">
                🗑️ Limpar Histórico
