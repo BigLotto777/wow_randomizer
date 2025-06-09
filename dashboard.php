@@ -3,7 +3,6 @@ session_start();
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/conexao.php';
 
-// Verificar se está logado
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: login.php');
     exit;
@@ -44,7 +43,7 @@ $nome_usuario = $_SESSION['nome_usuario'] ?? 'Aventureiro';
     <p class="text-light mb-5">O que você deseja fazer hoje no mundo de Azeroth?</p>
 
     <div class="row g-4 justify-content-center">
-        <!-- Card 1 -->
+        <!-- Card 1 - Gerar -->
         <div class="col-md-5">
             <div class="card wow-card fade-in h-100">
                 <div class="card-body">
@@ -54,6 +53,7 @@ $nome_usuario = $_SESSION['nome_usuario'] ?? 'Aventureiro';
                 </div>
             </div>
         </div>
+
         <!-- Card 2 - Histórico -->
         <div class="col-md-5">
             <div class="card wow-card fade-in h-100">
@@ -64,16 +64,18 @@ $nome_usuario = $_SESSION['nome_usuario'] ?? 'Aventureiro';
                 </div>
             </div>
         </div>
+
         <!-- Card 3 - Configurações -->
         <div class="col-md-5">
             <div class="card wow-card fade-in h-100">
                 <div class="card-body">
                     <h4 class="card-title mb-3">⚙️ Configurações</h4>
                     <p class="card-text">Gerencie sua conta, altere sua senha ou atualize seu perfil.</p>
-                    <button class="btn btn-secondary" disabled>Em desenvolvimento</button>
+                    <a href="configuracoes.php" class="btn btn-secondary text-white fw-bold">Abrir Configurações</a>
                 </div>
             </div>
         </div>
+
         <!-- Card 4 - Logout -->
         <div class="col-md-5">
             <div class="card wow-card fade-in h-100">

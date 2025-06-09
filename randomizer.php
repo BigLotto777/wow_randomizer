@@ -71,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body style="background-color: #111;">
 
-    <!-- ✅ Header atualizado -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-warning shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.php">
@@ -92,7 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </nav>
 
-    <!-- Conteúdo -->
     <div class="container mt-5">
         <h2 class="text-center mb-4">Gerar Novo Aventureiro!</h2>
 
@@ -147,9 +145,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span class="wow-label">🏳️ Facção:</span>
                         <?php
                         $facCode = strtolower($personagem['faccao']) === 'h' ? 'h' : 'a';
-
                         echo "<img class='wow-icon' src='assets/img/icons/faccao_{$facCode}.png' alt='Facção'> ";
-                        echo htmlspecialchars($personagem['faccao']);
+                        echo "<span class='wow-info-text'>" . htmlspecialchars($personagem['faccao']) . "</span>";
                         ?>
                     </p>
 
@@ -181,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $label = $mapaGenero[$racaKey] ?? $racaOriginal;
 
                         echo "<img class='wow-icon' src='{$iconeRaca}' alt='{$label}'> ";
-                        echo htmlspecialchars($label);
+                        echo "<span class='wow-info-text'>" . htmlspecialchars($label) . "</span>";
                         ?>
                     </p>
 
@@ -195,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         echo "<img class='wow-icon' src='{$classeIcon}' alt='Classe'> ";
                         echo "<span class='wow-badge' style='background-color: {$corClasse}'>" . htmlspecialchars($personagem['classe']) . "</span>";
-                        echo " (" . htmlspecialchars($personagem['tipo_combate']) . ")";
+                        echo " <span class='wow-info-text'>(" . htmlspecialchars($personagem['tipo_combate']) . ")</span>";
                         ?>
                     </p>
 
@@ -214,7 +211,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p><?= htmlspecialchars($personagem['descricao']) ?></p>
                         </div>
                     <?php endif; ?>
-
                 </div>
             </div>
         <?php endif; ?>

@@ -40,7 +40,19 @@ $query = $conn->prepare("
 $query->bind_param("i", $usuario_id);
 $query->execute();
 $result = $query->get_result();
+
+function sanitize_icon_name($string, $is_race = false) {
+    $string = strtolower($string);
+    $string = str_replace(
+        ['ã','á','â','à','é','ê','í','ó','ô','õ','ú','ç'],
+        ['a','a','a','a','e','e','i','o','o','o','u','c'],
+        $string
+    );
+    $string = trim($string);
+    return $is_race ? str_replace(' ', '_', $string) : str_replace(' ', '', $string);
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -80,8 +92,8 @@ $result = $query->get_result();
         </div>
 
         <div class="table-responsive">
-            <table class="table table-dark table-hover table-bordered align-middle">
-                <thead class="table-dark border-bottom border-warning">
+            <table class="table table-dark table-bordered align-middle text-center">
+                <thead class="table-dark text-warning border-bottom border-warning">
                     <tr>
                         <th>Data</th>
                         <th>Facção</th>
@@ -94,52 +106,38 @@ $result = $query->get_result();
                     </tr>
                 </thead>
                 <tbody>
-                <?php while ($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($row['data_geracao']))) ?></td>
-
-                        <!-- Facção -->
-                        <td>
-                            <img src="assets/img/icons/faccao_<?= strtolower($row['faccao']) ?>.png" width="24" alt="Fac">
-                            <?= htmlspecialchars($row['faccao']) ?>
-                        </td>
-
-                        <!-- Raça -->
-                        <td>
-                            <?php
-                            $racaSan = strtolower(str_replace(' ', '_', $row['raca']));
-                            echo "<img src='assets/img/racas/{$racaSan}_m.png' alt='Raça' width='24'> ";
-                            ?>
-                            <?= htmlspecialchars($row['raca']) ?>
-                        </td>
-
-                        <!-- Classe -->
-                        <td>
-                            <?php
-                            $classeSan = strtolower(
-                                str_replace(
-                                    ['ã','á','â','à','é','ê','í','ó','ô','õ','ú','ç',' '],
-                                    ['a','a','a','a','e','e','i','o','o','o','u','c',''],
-                                    $row['classe']
-                                )
-                            );
-                            echo "<img src='assets/img/icons/{$classeSan}.png' alt='Classe' width='24'> ";
-                            ?>
-                            <?= htmlspecialchars($row['classe']) ?>
-                        </td>
-
-                        <td><?= htmlspecialchars($row['especializacao']) ?></td>
-                        <td><?= htmlspecialchars($row['funcao']) ?></td>
-                        <td><?= htmlspecialchars($row['tipo_combate']) ?></td>
-
-                        <td>
-                            <a href="historico.php?delete=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
-                               onclick="return confirm('Deseja excluir este registro?')">
-                               Excluir
-                            </a>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
+                    <?php while ($row = $result->fetch_assoc()):
+                        $icone_faccao = 'assets/img/icons/faccao_' . strtolower($row['faccao']) . '.png';
+                        $raca_san = sanitize_icon_name($row['raca'], true);
+                        $classe_san = sanitize_icon_name($row['classe']);
+                        $icone_raca = "assets/img/racas/{$raca_san}_m.png";
+                        $icone_classe = "assets/img/icons/{$classe_san}.png";
+                    ?>
+                        <tr>
+                            <td><?= date('d/m/Y H:i', strtotime($row['data_geracao'])) ?></td>
+                            <td>
+                                <img src="<?= $icone_faccao ?>" width="30" alt="Facção">
+                                <br><?= htmlspecialchars($row['faccao']) ?>
+                            </td>
+                            <td>
+                                <img src="<?= $icone_raca ?>" width="30" alt="Raça">
+                                <br><?= htmlspecialchars($row['raca']) ?>
+                            </td>
+                            <td>
+                                <img src="<?= $icone_classe ?>" width="30" alt="Classe">
+                                <br><?= htmlspecialchars($row['classe']) ?>
+                            </td>
+                            <td><?= htmlspecialchars($row['especializacao']) ?></td>
+                            <td><?= htmlspecialchars($row['funcao']) ?></td>
+                            <td><?= htmlspecialchars($row['tipo_combate']) ?></td>
+                            <td>
+                                <a href="historico.php?delete=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Deseja excluir este registro?')">
+                                   Excluir
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
         </div>
@@ -149,8 +147,8 @@ $result = $query->get_result();
         </div>
     <?php endif; ?>
 
-    <div class="mt-3 d-flex justify-content-center gap-2">
-        <a href="dashboard.php" class="btn btn-secondary">Voltar para Dashboard</a>
+    <div class="text-center mt-4">
+        <a href="dashboard.php" class="btn btn-secondary me-2">Voltar para Dashboard</a>
         <a href="randomizer.php" class="btn btn-primary">Gerar Novo Personagem</a>
     </div>
 </div>
