@@ -1,0 +1,1 @@
+documentation indexed on Documentacao_WoW_Randomizer.docx
